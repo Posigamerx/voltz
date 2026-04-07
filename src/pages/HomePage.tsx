@@ -24,27 +24,27 @@ export function HomePage() {
         {/* Volt glow */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-volt-400/5 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-24">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-24">
           <div className="max-w-3xl">
             <span className="inline-flex items-center gap-2 text-xs font-mono text-volt-400 bg-volt-400/10 border border-volt-400/20 rounded-full px-3 py-1.5 mb-6">
               <span className="w-1.5 h-1.5 rounded-full bg-volt-400 animate-pulse" />
               New arrivals weekly
             </span>
-            <h1 className="font-display text-6xl sm:text-7xl md:text-8xl font-black tracking-tighter leading-none mb-6">
+            <h1 className="font-display text-5xl sm:text-6xl md:text-8xl font-black tracking-tighter leading-none mb-6">
               Next-gen
               <br />
               <span className="text-volt-400">electronics.</span>
             </h1>
-            <p className="text-lg text-white/50 max-w-xl mb-10 leading-relaxed">
+            <p className="text-base sm:text-lg text-white/50 max-w-xl mb-10 leading-relaxed">
               Cutting-edge gadgets, flagship phones, pro audio. Everything for the tech-obsessed,
               curated and shipped fast.
             </p>
-            <div className="flex flex-wrap gap-3">
-              <Link to="/products">
-                <Button size="lg">Shop all products</Button>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Link to="/products" className="w-full sm:w-auto">
+                <Button size="lg" className="w-full">Shop all products</Button>
               </Link>
-              <Link to="/products?category=phones">
-                <Button size="lg" variant="secondary">Browse phones</Button>
+              <Link to="/products?category=phones" className="w-full sm:w-auto">
+                <Button size="lg" variant="secondary" className="w-full">Browse phones</Button>
               </Link>
             </div>
           </div>
@@ -52,9 +52,9 @@ export function HomePage() {
       </section>
 
       {/* Categories */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-20">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
         <h2 className="font-display text-2xl font-bold mb-8">Shop by category</h2>
-        <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
           {CATEGORIES.map(({ label, slug, icon }) => (
             <Link
               key={slug}

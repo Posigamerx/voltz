@@ -39,9 +39,14 @@ export function Footer() {
           <p className="text-xs text-white/25 font-mono">
             © {new Date().getFullYear()} VOLTZ. All rights reserved.
           </p>
-          <p className="text-xs text-white/25 font-mono">
-            Built with React + Supabase
-          </p>
+          <div className="flex items-center gap-6">
+            <Link to="/admin" className="text-xs text-white/25 hover:text-white/80 font-mono transition-colors">
+              Admin Portal
+            </Link>
+            <p className="text-xs text-white/25 font-mono">
+              Built with React + Supabase
+            </p>
+          </div>
         </div>
       </div>
     </footer>
