@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { formatPrice, formatDiscount, slugify, truncate } from '@/lib/utils'
+import { formatPrice, discountPercent, slugify, truncate } from '@/lib/utils'
 
 describe('formatPrice', () => {
   it('formats USD correctly', () => {
@@ -8,10 +8,10 @@ describe('formatPrice', () => {
   })
 })
 
-describe('formatDiscount', () => {
+describe('discountPercent', () => {
   it('calculates percentage discount', () => {
-    expect(formatDiscount(100, 80)).toBe(20)
-    expect(formatDiscount(1499, 1299)).toBe(13)
+    expect(discountPercent(100, 80)).toBe(20)
+    expect(discountPercent(1499, 1299)).toBe(13)
   })
 })
 

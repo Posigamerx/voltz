@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useCart } from '@/hooks'
 import { useAuthStore } from '@/store'
 import { Button } from '@/components/ui'

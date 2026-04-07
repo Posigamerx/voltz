@@ -13,14 +13,13 @@ import type { ShippingData } from './ShippingForm'
 
 // ─── Inner form (must be inside <Elements>) ────────────────────────────────
 interface InnerFormProps {
-  clientSecret: string
   total: number
   shippingData: ShippingData
   onSuccess: (orderId: string) => void
   onBack: () => void
 }
 
-function StripeForm({ clientSecret, total, shippingData, onSuccess, onBack }: InnerFormProps) {
+function StripeForm({ total, shippingData, onSuccess, onBack }: InnerFormProps) {
   const stripe    = useStripe()
   const elements  = useElements()
   const { items, clearCart } = useCartStore()
@@ -202,7 +201,6 @@ export function PaymentForm({ shippingData, total, onSuccess, onBack }: PaymentF
       }}
     >
       <StripeForm
-        clientSecret={clientSecret}
         total={total}
         shippingData={shippingData}
         onSuccess={onSuccess}
