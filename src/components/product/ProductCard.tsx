@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom'
+import { useCartStore } from '@/store'
+import { useToast } from '@/hooks'
 import { Badge, Button } from '@/components/ui'
-import { useCart, useToast } from '@/hooks'
-import { formatDollars, discountPercent } from '@/lib/utils'
+import { WishlistButton } from '@/components/user'
+import { formatPrice, formatDiscount } from '@/lib/utils'
 import type { Product } from '@/types'
 
 interface ProductCardProps {
@@ -9,99 +11,75 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
-  const { addItem, openCart } = useCart()
-  const { success } = useToast()
+  const { addItem, openCart } = useCartStore()
+  const toast = useToast()
 
-  function handleAddToCart(e: React.MouseEvent) {
+  const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault()
     addItem(product)
-    success(`${product.name} added to cart`)
+    toast.success(`${product.name} added to cart`)
     openCart()
   }
 
-  const isOutOfStock = product.stock === 0
-  const hasDiscount = product.compare_at_price && product.compare_at_price > product.price
+  const discount = product.compare_at_price
+    ? formatDiscount(product.compare_at_price, product.price)
+    : null
 
   return (
     <Link
       to={`/products/${product.slug}`}
-      className="group relative bg-zinc-900 rounded-2xl overflow-hidden border border-white/5 hover:border-white/15 transition-all duration-300 flex flex-col"
+      className="group flex flex-col rounded-xl border border-white/6 bg-zinc-900/40 p-4 transition-all duration-300 hover:border-white/12 hover:bg-zinc-900/70"
     >
       {/* Image */}
-      <div className="relative aspect-square bg-zinc-800 overflow-hidden">
-        {product.images[0] ? (
-          <img
-            src={product.images[0]}
-            alt={product.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-white/10">
-            <svg className="w-16 h-16" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
+      <div className="relative mb-4 aspect-square overflow-hidden rounded-lg bg-zinc-800/60">
+        <img
+          src={product.images[0]}
+          alt={product.name}
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          loading="lazy"
+        />
+        {discount && (
+          <Badge variant="volt" className="absolute left-2 top-2">-{discount}%</Badge>
+        )}
+        {product.stock === 0 && (
+          <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-black/60">
+            <Badge variant="danger">Out of stock</Badge>
           </div>
         )}
-
-        {/* Badges */}
-        <div className="absolute top-3 left-3 flex flex-col gap-1.5">
-          {hasDiscount && (
-            <Badge variant="volt">
-              -{discountPercent(product.price, product.compare_at_price!)}%
-            </Badge>
-          )}
-          {isOutOfStock && <Badge variant="danger">Out of stock</Badge>}
-          {product.featured && !isOutOfStock && <Badge variant="default">Featured</Badge>}
+        {/* Wishlist button floats on image */}
+        <div className="absolute right-2 top-2" onClick={(e) => e.preventDefault()}>
+          <WishlistButton productId={product.id} />
         </div>
-
-        {/* Quick add — visible on hover */}
-        {!isOutOfStock && (
-          <div className="absolute bottom-0 inset-x-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-            <Button
-              size="sm"
-              onClick={handleAddToCart}
-              className="w-full"
-            >
-              Add to cart
-            </Button>
-          </div>
-        )}
       </div>
 
       {/* Info */}
-      <div className="p-4 flex flex-col gap-1 flex-1">
-        <p className="text-xs text-white/30 font-mono uppercase tracking-wider">{product.brand}</p>
-        <h3 className="text-sm font-display font-semibold text-white/90 leading-snug line-clamp-2 group-hover:text-white transition-colors">
+      <div className="flex flex-1 flex-col gap-1">
+        <p className="font-mono text-[10px] uppercase tracking-widest text-white/30">{product.brand}</p>
+        <h3 className="font-display text-sm font-semibold leading-snug text-white group-hover:text-volt-400 transition-colors line-clamp-2">
           {product.name}
         </h3>
-
-        {/* Rating */}
         <div className="flex items-center gap-1.5 mt-1">
-          <div className="flex">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <svg
-                key={i}
-                className={`w-3 h-3 ${i < Math.round(product.rating) ? 'text-volt-400' : 'text-white/15'}`}
-                fill="currentColor" viewBox="0 0 20 20"
-              >
-                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-              </svg>
-            ))}
+          <div className="flex text-volt-400 text-xs">
+            {'★'.repeat(Math.round(product.rating))}
+            <span className="text-white/20">{'★'.repeat(5 - Math.round(product.rating))}</span>
           </div>
-          <span className="text-xs text-white/30">({product.review_count})</span>
+          <span className="font-mono text-[10px] text-white/30">({product.review_count})</span>
         </div>
+      </div>
 
-        {/* Price */}
-        <div className="flex items-baseline gap-2 mt-auto pt-2">
-          <span className="font-display font-bold text-white">
-            {formatDollars(product.price)}
-          </span>
-          {hasDiscount && (
-            <span className="text-sm text-white/30 line-through">
-              {formatDollars(product.compare_at_price!)}
+      {/* Price + CTA */}
+      <div className="mt-3 flex items-center justify-between border-t border-white/6 pt-3">
+        <div>
+          <span className="font-display text-base font-bold text-white">{formatPrice(product.price)}</span>
+          {product.compare_at_price && (
+            <span className="ml-2 font-mono text-xs text-white/30 line-through">
+              {formatPrice(product.compare_at_price)}
             </span>
           )}
         </div>
+        <Button size="sm" onClick={handleAddToCart} disabled={product.stock === 0} className="shrink-0">
+          Add
+        </Button>
       </div>
     </Link>
   )

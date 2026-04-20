@@ -3,15 +3,15 @@ import { formatPrice, discountPercent, slugify, truncate } from '@/lib/utils'
 
 describe('formatPrice', () => {
   it('formats USD correctly', () => {
-    expect(formatPrice(1299)).toBe('$1,299.00')
-    expect(formatPrice(9.99)).toBe('$9.99')
+    expect(formatPrice(1299)).toBe('$12.99')
+    expect(formatPrice(999)).toBe('$9.99')
   })
 })
 
 describe('discountPercent', () => {
   it('calculates percentage discount', () => {
-    expect(discountPercent(100, 80)).toBe(20)
-    expect(discountPercent(1499, 1299)).toBe(13)
+    expect(discountPercent(80, 100)).toBe(20)
+    expect(discountPercent(1299, 1499)).toBe(13)
   })
 })
 

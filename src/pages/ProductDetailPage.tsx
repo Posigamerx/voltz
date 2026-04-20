@@ -1,154 +1,167 @@
-import { useParams, Link } from 'react-router-dom'
 import { useState } from 'react'
-import { useProduct, useCart, useToast } from '@/hooks'
-import { Button, Badge, Skeleton } from '@/components/ui'
-import { formatDollars, discountPercent } from '@/lib/utils'
+import { useParams, useNavigate } from 'react-router-dom'
+import { useProduct } from '@/hooks'
+import { useCartStore } from '@/store'
+import { useToast } from '@/hooks'
+import { Button, Badge, ProductDetailSkeleton } from '@/components/ui'
+import { WishlistButton } from '@/components/user'
+import { formatPrice, formatDiscount } from '@/lib/utils'
 
 export function ProductDetailPage() {
-  const { slug } = useParams<{ slug: string }>()
+  const { slug }                            = useParams<{ slug: string }>()
   const { data: product, isLoading, error } = useProduct(slug!)
-  const { addItem, openCart } = useCart()
-  const { success } = useToast()
-  const [selectedImage, setSelectedImage] = useState(0)
-  const [qty, setQty] = useState(1)
+  const { addItem, openCart }               = useCartStore()
+  const toast                               = useToast()
+  const navigate                            = useNavigate()
+  const [selectedImage, setSelectedImage]   = useState(0)
+  const [quantity, setQuantity]             = useState(1)
 
-  if (isLoading) {
-    return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
-        <div className="grid md:grid-cols-2 gap-12">
-          <Skeleton className="aspect-square rounded-2xl" />
-          <div className="space-y-4">
-            <Skeleton className="h-8 w-3/4" />
-            <Skeleton className="h-4 w-1/2" />
-            <Skeleton className="h-10 w-1/3" />
-            <Skeleton className="h-32 w-full" />
-          </div>
-        </div>
-      </div>
-    )
-  }
+  if (isLoading) return <ProductDetailSkeleton />
 
   if (error || !product) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-24 text-center">
-        <p className="text-white/30">Product not found.</p>
-        <Link to="/products" className="text-volt-400 text-sm mt-4 inline-block">← Back to products</Link>
+      <div className="flex flex-col items-center gap-4 py-32 text-center">
+        <span className="text-5xl">⚡</span>
+        <p className="font-display text-xl font-bold">Product not found</p>
+        <Button variant="secondary" onClick={() => navigate('/products')}>← Back to products</Button>
       </div>
     )
   }
 
-  function handleAdd() {
-    addItem(product!, qty)
-    success(`${product!.name} added to cart`)
+  const discount = product.compare_at_price
+    ? formatDiscount(product.compare_at_price, product.price)
+    : null
+
+  const handleAddToCart = () => {
+    addItem(product, quantity)
+    toast.success(`${product.name} added to cart`)
     openCart()
   }
 
-  const hasDiscount = product.compare_at_price && product.compare_at_price > product.price
-
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
-      <Link to="/products" className="text-sm text-white/40 hover:text-white transition-colors mb-8 inline-flex items-center gap-1">
-        ← All products
-      </Link>
+    <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 animate-fade-in">
+      <button
+        onClick={() => navigate(-1)}
+        className="mb-8 flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-white/40 hover:text-white transition-colors"
+      >
+        ← Back
+      </button>
 
-      <div className="grid md:grid-cols-2 gap-12 mt-6">
+      <div className="grid gap-12 lg:grid-cols-2">
         {/* Images */}
-        <div className="space-y-3">
-          <div className="aspect-square bg-zinc-900 rounded-2xl overflow-hidden border border-white/5">
-            {product.images[selectedImage] ? (
-              <img
-                src={product.images[selectedImage]}
-                alt={product.name}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-white/10">
-                <svg className="w-24 h-24" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-              </div>
-            )}
+        <div>
+          <div className="relative aspect-square overflow-hidden rounded-2xl border border-white/8 bg-zinc-900">
+            <img
+              src={product.images[selectedImage]}
+              alt={product.name}
+              className="h-full w-full object-cover transition-all duration-500"
+            />
+            {/* Wishlist on detail page */}
+            <div className="absolute right-3 top-3">
+              <WishlistButton productId={product.id} className="h-10 w-10" />
+            </div>
           </div>
           {product.images.length > 1 && (
-            <div className="flex gap-2">
-              {product.images.map((src, i) => (
+            <div className="mt-4 flex gap-2">
+              {product.images.map((img, i) => (
                 <button
                   key={i}
                   onClick={() => setSelectedImage(i)}
-                  className={`w-16 h-16 rounded-lg overflow-hidden border-2 transition-colors ${
-                    i === selectedImage ? 'border-volt-400' : 'border-transparent'
+                  className={`h-16 w-16 overflow-hidden rounded-lg border-2 transition-colors ${
+                    i === selectedImage ? 'border-volt-400' : 'border-white/10 hover:border-white/20'
                   }`}
                 >
-                  <img src={src} alt="" className="w-full h-full object-cover" />
+                  <img src={img} alt="" className="h-full w-full object-cover" />
                 </button>
               ))}
             </div>
           )}
         </div>
 
-        {/* Details */}
-        <div>
-          <div className="flex flex-wrap gap-2 mb-3">
-            <Badge>{product.category}</Badge>
-            {product.stock === 0 && <Badge variant="danger">Out of stock</Badge>}
-            {product.stock > 0 && product.stock < 5 && (
-              <Badge variant="warning">Only {product.stock} left</Badge>
-            )}
+        {/* Info */}
+        <div className="flex flex-col gap-5">
+          <div>
+            <p className="font-mono text-xs uppercase tracking-widest text-white/30">{product.brand}</p>
+            <h1 className="mt-1 font-display text-3xl font-black leading-tight">{product.name}</h1>
           </div>
 
-          <p className="text-sm text-white/30 font-mono mb-1">{product.brand}</p>
-          <h1 className="font-display text-3xl font-bold leading-tight mb-4">{product.name}</h1>
-
           {/* Rating */}
-          <div className="flex items-center gap-2 mb-6">
-            <div className="flex">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <svg key={i} className={`w-4 h-4 ${i < Math.round(product.rating) ? 'text-volt-400' : 'text-white/15'}`}
-                  fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
-              ))}
-            </div>
-            <span className="text-sm text-white/40">{product.rating} ({product.review_count} reviews)</span>
+          <div className="flex items-center gap-2">
+            <div className="flex text-volt-400">{'★'.repeat(Math.round(product.rating))}</div>
+            <span className="font-mono text-xs text-white/40">
+              {product.rating} ({product.review_count} reviews)
+            </span>
           </div>
 
           {/* Price */}
-          <div className="flex items-baseline gap-3 mb-6">
-            <span className="font-display text-4xl font-black">{formatDollars(product.price)}</span>
-            {hasDiscount && (
+          <div className="flex items-baseline gap-3">
+            <span className="font-display text-4xl font-black">{formatPrice(product.price)}</span>
+            {product.compare_at_price && (
               <>
-                <span className="text-xl text-white/30 line-through">{formatDollars(product.compare_at_price!)}</span>
-                <Badge variant="volt">Save {discountPercent(product.price, product.compare_at_price!)}%</Badge>
+                <span className="font-mono text-lg text-white/30 line-through">
+                  {formatPrice(product.compare_at_price)}
+                </span>
+                <Badge variant="volt">-{discount}%</Badge>
               </>
             )}
           </div>
 
-          <p className="text-white/60 leading-relaxed mb-8">{product.description}</p>
+          <p className="leading-relaxed text-white/60">{product.description}</p>
 
-          {/* Quantity + Add */}
-          <div className="flex items-center gap-3 mb-4">
-            <div className="flex items-center border border-white/10 rounded-xl overflow-hidden">
-              <button onClick={() => setQty(q => Math.max(1, q - 1))} className="px-4 py-3 text-white/50 hover:text-white hover:bg-white/5 transition-colors">−</button>
-              <span className="px-4 font-mono text-sm">{qty}</span>
-              <button onClick={() => setQty(q => Math.min(product.stock, q + 1))} disabled={qty >= product.stock} className="px-4 py-3 text-white/50 hover:text-white hover:bg-white/5 transition-colors disabled:opacity-30">+</button>
-            </div>
-            <Button size="lg" onClick={handleAdd} disabled={product.stock === 0} className="flex-1">
-              {product.stock === 0 ? 'Out of stock' : 'Add to cart'}
-            </Button>
+          {/* Stock indicator */}
+          <div className="flex items-center gap-2">
+            <div className={`h-2 w-2 rounded-full ${product.stock > 10 ? 'bg-emerald-400' : product.stock > 0 ? 'bg-amber-400' : 'bg-red-400'}`} />
+            <span className={`font-mono text-xs ${product.stock > 10 ? 'text-emerald-400' : product.stock > 0 ? 'text-amber-400' : 'text-red-400'}`}>
+              {product.stock > 10 ? 'In stock' : product.stock > 0 ? `Only ${product.stock} left` : 'Out of stock'}
+            </span>
           </div>
+
+          {/* Quantity */}
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 rounded-lg border border-white/10 bg-zinc-900 px-4 py-2">
+              <button
+                onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                className="w-4 text-center text-white/50 hover:text-white transition-colors"
+              >−</button>
+              <span className="w-6 text-center font-mono text-sm">{quantity}</span>
+              <button
+                onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
+                disabled={quantity >= product.stock}
+                className="w-4 text-center text-white/50 hover:text-white transition-colors disabled:opacity-30"
+              >+</button>
+            </div>
+            <span className="font-display text-lg font-bold text-white/60">
+              = {formatPrice(product.price * quantity)}
+            </span>
+          </div>
+
+          <Button size="lg" onClick={handleAddToCart} disabled={product.stock === 0} className="w-full">
+            {product.stock === 0 ? 'Out of stock' : `Add to cart →`}
+          </Button>
+
+          {/* Tags */}
+          {product.tags.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {product.tags.map((tag) => (
+                <span key={tag} className="rounded-full border border-white/8 px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-white/30">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
 
           {/* Specs */}
           {Object.keys(product.specs).length > 0 && (
-            <div className="mt-8 border-t border-white/5 pt-8">
-              <h3 className="font-display font-semibold mb-4 text-white/80">Specifications</h3>
-              <div className="space-y-2">
+            <div className="rounded-xl border border-white/8 p-5">
+              <p className="mb-4 font-mono text-[10px] uppercase tracking-widest text-white/30">Specifications</p>
+              <dl className="flex flex-col gap-2.5">
                 {Object.entries(product.specs).map(([key, val]) => (
-                  <div key={key} className="flex gap-4 text-sm">
-                    <span className="text-white/30 w-32 shrink-0">{key}</span>
-                    <span className="text-white/70">{val}</span>
+                  <div key={key} className="flex justify-between gap-4 text-sm border-b border-white/4 pb-2 last:border-0 last:pb-0">
+                    <dt className="text-white/40 shrink-0">{key}</dt>
+                    <dd className="font-medium text-right">{val}</dd>
                   </div>
                 ))}
-              </div>
+              </dl>
             </div>
           )}
         </div>
