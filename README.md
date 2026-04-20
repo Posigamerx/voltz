@@ -71,17 +71,17 @@ npm run dev
 
 ## Routes
 
-| Path | Access | Description |
-|------|--------|-------------|
-| `/` | Public | Home / landing page |
-| `/products` | Public | Product listing with filters |
-| `/products/:slug` | Public | Product detail page |
-| `/wishlist` | Public | Saved / wishlist items |
-| `/checkout` | Protected | Multi-step checkout |
-| `/account` | Protected | Account overview & order history |
-| `/orders` | Protected | Full order list |
-| `/admin` | Admin | Product management |
-| `/admin/orders` | Admin | Order status management |
+| Path              | Access    | Description                      |
+| ----------------- | --------- | -------------------------------- |
+| `/`               | Public    | Home / landing page              |
+| `/products`       | Public    | Product listing with filters     |
+| `/products/:slug` | Public    | Product detail page              |
+| `/wishlist`       | Public    | Saved / wishlist items           |
+| `/checkout`       | Protected | Multi-step checkout              |
+| `/account`        | Protected | Account overview & order history |
+| `/orders`         | Protected | Full order list                  |
+| `/admin`          | Admin     | Product management               |
+| `/admin/orders`   | Admin     | Order status management          |
 
 ---
 
@@ -95,14 +95,14 @@ pending → confirmed → processing → shipped → delivered
 
 Cancellation (`cancelled`) can be applied at any stage. Each status has a distinct colour indicator in the UI:
 
-| Status | Colour |
-|--------|--------|
-| Pending | Amber |
-| Confirmed | Blue |
-| Processing | Indigo |
-| Shipped | Purple |
-| Delivered | Emerald |
-| Cancelled | Red |
+| Status     | Colour  |
+| ---------- | ------- |
+| Pending    | Amber   |
+| Confirmed  | Blue    |
+| Processing | Indigo  |
+| Shipped    | Purple  |
+| Delivered  | Emerald |
+| Cancelled  | Red     |
 
 ---
 
@@ -144,32 +144,34 @@ supabase/
 
 ## Utility Functions (`src/lib/utils.ts`)
 
-| Export | Description |
-|--------|-------------|
-| `cn(...inputs)` | Merges Tailwind class names safely via `clsx` + `tailwind-merge` |
-| `formatPrice(amount, currency?)` | Formats a number as a currency string (default USD) |
-| `formatDollars` | Alias for `formatPrice` |
-| `formatDiscount(original, sale)` | Returns integer discount percentage |
-| `discountPercent` | Alias for `formatDiscount` |
-| `slugify(text)` | Converts a string to a URL-safe slug |
-| `truncate(text, length)` | Truncates text with an ellipsis |
-| `formatDate(dateStr)` | Formats a date string as `Apr 20, 2026` |
-| `formatDateTime(dateStr)` | Formats a date string with time |
-| `ORDER_STATUS_LABELS` | Human-readable label per `OrderStatus` |
-| `ORDER_STATUS_COLORS` | Tailwind class string per `OrderStatus` |
-| `ORDER_STATUS_STEPS` | Ordered array of statuses for progress indicators |
+| Export                           | Description                                                      |
+| -------------------------------- | ---------------------------------------------------------------- |
+| `cn(...inputs)`                  | Merges Tailwind class names safely via `clsx` + `tailwind-merge` |
+| `formatPrice(amount, currency?)` | Formats a number as a currency string (default USD)              |
+| `formatDollars`                  | Alias for `formatPrice`                                          |
+| `formatDiscount(original, sale)` | Returns integer discount percentage                              |
+| `discountPercent`                | Alias for `formatDiscount`                                       |
+| `slugify(text)`                  | Converts a string to a URL-safe slug                             |
+| `truncate(text, length)`         | Truncates text with an ellipsis                                  |
+| `formatDate(dateStr)`            | Formats a date string as `Apr 20, 2026`                          |
+| `formatDateTime(dateStr)`        | Formats a date string with time                                  |
+| `ORDER_STATUS_LABELS`            | Human-readable label per `OrderStatus`                           |
+| `ORDER_STATUS_COLORS`            | Tailwind class string per `OrderStatus`                          |
+| `ORDER_STATUS_STEPS`             | Ordered array of statuses for progress indicators                |
 
 ---
 
 ## Deployment (Vercel)
 
 **Via GitHub:**
+
 1. Push the repository to GitHub
 2. Import it in [vercel.com](https://vercel.com)
 3. Add the environment variables from `.env`
 4. Vercel auto-detects Vite — click **Deploy**
 
 **Via CLI:**
+
 ```bash
 npx vercel          # preview deploy
 npx vercel --prod   # production deploy
@@ -178,13 +180,3 @@ npx vercel --prod   # production deploy
 > After deploying, update the **Site URL** in Supabase → Authentication → URL Configuration to your Vercel domain.
 
 ---
-
-## Test Cards (Stripe Test Mode)
-
-| Card Number | Result |
-|-------------|--------|
-| `4242 4242 4242 4242` | Payment succeeds |
-| `4000 0000 0000 9995` | Card declined |
-| `4000 0025 0000 3155` | 3D Secure authentication |
-
-Use any future expiry date and any 3-digit CVC.
