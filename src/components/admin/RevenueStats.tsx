@@ -47,15 +47,16 @@ export function RevenueStats({ orders }: RevenueStatsProps) {
       <div className="rounded-xl border border-white/8 bg-zinc-900/40 p-5">
         <p className="mb-4 font-mono text-[10px] uppercase tracking-widest text-white/30">Orders by status</p>
         <div className="flex flex-col gap-3">
-          {(['pending','confirmed','shipped','delivered','cancelled'] as OrderStatus[]).map((status) => {
+          {(['pending','confirmed','processing','shipped','delivered','cancelled'] as OrderStatus[]).map((status) => {
             const count   = stats.statusCounts[status] ?? 0
             const pct     = stats.totalOrders ? Math.round((count / stats.totalOrders) * 100) : 0
             const barColors: Record<OrderStatus, string> = {
-              pending:   'bg-amber-400',
-              confirmed: 'bg-blue-400',
-              shipped:   'bg-purple-400',
-              delivered: 'bg-emerald-400',
-              cancelled: 'bg-red-400',
+              pending:    'bg-amber-400',
+              confirmed:  'bg-blue-400',
+              processing: 'bg-indigo-400',
+              shipped:    'bg-purple-400',
+              delivered:  'bg-emerald-400',
+              cancelled:  'bg-red-400',
             }
             return (
               <div key={status} className="flex items-center gap-3">

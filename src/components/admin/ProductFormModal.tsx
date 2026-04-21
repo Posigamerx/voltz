@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Modal, Button, Input, Badge } from '@/components/ui'
+import { Modal, Button, Input } from '@/components/ui'
 import { slugify } from '@/lib/utils'
 import type { Product } from '@/types'
 

@@ -105,24 +105,7 @@ function StripeForm({ total, shippingData, onSuccess, onBack }: StripeFormProps)
     <form onSubmit={handleSubmit} className="flex flex-col gap-5">
       <div className="rounded-xl border border-white/8 bg-zinc-900/50 p-5">
         <p className="mb-4 font-mono text-[10px] uppercase tracking-widest text-white/30">Card details</p>
-        <PaymentElement
-          options={{
-            layout: 'tabs',
-            appearance: {
-              theme: 'night',
-              variables: {
-                colorPrimary:         '#e8ff00',
-                colorBackground:      '#18181b',
-                colorText:            '#ffffff',
-                colorDanger:          '#f87171',
-                fontFamily:           '"DM Sans", sans-serif',
-                borderRadius:         '8px',
-                colorInputBackground: '#111113',
-                colorTextPlaceholder: 'rgba(255,255,255,0.25)',
-              },
-            },
-          }}
-        />
+        <PaymentElement options={{ layout: 'tabs' }} />
       </div>
 
       <div className="flex items-center gap-2 text-xs text-white/30">
@@ -228,7 +211,6 @@ export function PaymentForm({ shippingData, total, onSuccess, onBack }: PaymentF
             colorPrimary: '#e8ff00', colorBackground: '#18181b',
             colorText: '#ffffff', colorDanger: '#f87171',
             fontFamily: '"DM Sans", sans-serif', borderRadius: '8px',
-            colorInputBackground: '#111113',
           },
         },
       }}
